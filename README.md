@@ -1,4 +1,4 @@
-# rsync_backup
+# rsync backup
 A bash script that uses rsync to backup directories to an external source.
 
 script is in rsync_backup file
