@@ -1,0 +1,76 @@
+#!/bin/bash
+# script by mark :)
+# updated to log
+
+# ------------------------------
+# VARIABLES - CHANGE AS REQUIRED
+# ------------------------------
+
+# backup path - will backup everything from path down
+shared_path=$"replace_with_path"
+# log file path
+log_file=$"/root/log/rsync_backup.log"
+# mount point (eg: /media/external_hard_drive )
+exthd=$"replace_with_mount_point"
+# external device to mount and backup to (eg: /dev/sdb1 )
+device=$"replace_with_device"
+date=$(date -I)
+
+
+# ------
+# SCRIPT
+# ------
+
+{
+echo "--------------"
+echo "BACKUP STARTED"
+echo $(date +%F..%H:%M:%S)
+echo "-> mounting external drive "$device " to "$exthd
+mount $device $exthd &
+} 2>&1 | tee -a $log_file
+
+wait
+
+{
+echo "device mounted"
+echo "-> rsync shared to external drive"
+rsync -avu --delete $shared_path $exthd &
+} 2>&1 | tee -a $log_file
+
+wait
+
+# backup contents of /etc
+# comment out if not required
+ 
+{
+echo "COMPLETED"
+echo "-> rsync etc to external drive"
+rsync -avu /etc $exthd &
+} 2>&1 | tee -a $log_file
+
+wait
+
+# backup contents of /home
+# comment out if not required
+
+{
+echo "COMPLETED"
+echo "-> rsync home to external drive"
+rsync -avu --delete /home $exthd &
+} 2>&1 | tee -a $log_file
+
+wait
+
+{
+echo "COMPLETED"
+echo "-> unmounting external drive"
+umount $exthd &
+} 2>&1 | tee -a $log_file
+
+wait
+
+{
+echo "COMPLETED"
+echo
+} 2>&1 | tee -a $log_file
+
